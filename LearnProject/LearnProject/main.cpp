@@ -6,6 +6,8 @@ using namespace std;
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "shaderCode.hpp"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void create_vertex_shader(unsigned int* shader_id);
@@ -78,12 +80,18 @@ int main()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	while (!glfwWindowShouldClose(window))
 	{
+		//随时间变换颜色
+		float timeValue = glfwGetTime();
+		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+		int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+
 		// 输入
 		processInput(window);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
+		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 3);  // 顶点索引从0开始，一共3个顶点
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);  // 顶点个数，EBO中偏移量
@@ -130,13 +138,7 @@ void create_shader_program(unsigned int* shaderProgram)
 
 // 顶点着色器
 void create_vertex_shader(unsigned int* vertexShader) {
-	const char* vertexShaderSource = R"(
-		#version 330 core
-		layout (location = 0) in vec3 aPos;
-		void main()
-		{
-			gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-		})";
+	const char* vertexShaderSource = ShaderCode::vertex_code;
 	// unsigned int vertexShader;
 	*vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(*vertexShader, 1, &vertexShaderSource, NULL);
@@ -158,14 +160,7 @@ void create_vertex_shader(unsigned int* vertexShader) {
 //片元着色器
 void create_fragment_shader(unsigned int* fragmentShader)
 {
-	const char* fragmentShaderSource = R"(
-	#version 330 core
-	out vec4 FragColor;
-	void main()
-	{
-		FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-	}
-	)";
+	const char* fragmentShaderSource = ShaderCode::fragment_code;
 	// unsigned int fragmentShader;
 	*fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(*fragmentShader, 1, &fragmentShaderSource, NULL);
