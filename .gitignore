@@ -8,3 +8,14 @@
 /LearnProject/LearnProject/LearnProject.vcxproj
 /LearnProject/LearnProject/LearnProject.vcxproj.filters
 /LearnProject/LearnProject/LearnProject.vcxproj.user
+LearnProject/LearnProject/third_party_lib/glfw3.lib
+LearnProject/.vs/LearnProject/v15/Browse.VC.opendb
+LearnProject/.vs/LearnProject/v15/Browse.VC.db
+*.pdb
+*.idb
+*.obj
+LearnProject/LearnProject/x64/Debug/LearnProject.tlog/unsuccessfulbuild
+*.tlog
+*.log
+*.ipch
+LearnProject/.vs/LearnProject/v15/.suo

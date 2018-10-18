@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<iostream>
+#include <direct.h>
 using namespace std;
 
 #include <glad/glad.h>
@@ -16,6 +17,10 @@ void create_shader_program(unsigned int* shaderProgram);
 
 int main()
 {
+	char path[500];
+	_getcwd(path, 500);
+	cout << "Work Path: " << path << endl;
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
