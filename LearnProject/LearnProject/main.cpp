@@ -7,7 +7,8 @@ using namespace std;
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "shaderCode.hpp"
+#include "Shader.h"
+#include "ShaderCode.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -20,6 +21,9 @@ int main()
 	char path[500];
 	_getcwd(path, 500);
 	cout << "Work Path: " << path << endl;
+	string vPath = string(path) + "/ShaderCode.hpp";
+	string fPath = string(path) + "/main.cpp";
+	Shader shader1 = Shader(vPath.c_str(), fPath.c_str());
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -45,16 +49,15 @@ int main()
 
 	//顶点(不重复)
 	float vertices[] = {
-		0.5f, 0.5f, 0.0f,   // 右上角
-		0.5f, -0.5f, 0.0f,  // 右下角
-		-0.5f, -0.5f, 0.0f, // 左下角
-		-0.5f, 0.5f, 0.0f,   // 左上角
+		// 位置              // 颜色
+		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
+		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
+		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
 	};
 	//索引
 	unsigned int indices[] =
 	{
-		0, 1, 3,
-		1, 2, 3,
+		0, 1, 2,
 	};
 
 	//VAO: 顶点数组对象（存储的是调用）, 任何随后的顶点属性调用都会储存在这个VAO中
@@ -74,8 +77,11 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	
 	//设置顶点属性指针 参数:起始位置，向量维度，数据类型，是否标准化，步长，缓冲区偏移量
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);  // 对应了定点着色器中的location 0
+	//颜色属性
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);  // 对应了定点着色器中的location 1
 	
 	//创建着色器程序
 	unsigned int shaderProgram;
@@ -88,7 +94,6 @@ int main()
 		//随时间变换颜色
 		float timeValue = glfwGetTime();
 		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 
 		// 输入
 		processInput(window);
@@ -96,10 +101,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
-		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 3);  // 顶点索引从0开始，一共3个顶点
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);  // 顶点个数，EBO中偏移量
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)0);  // 顶点个数，EBO中偏移量
 		glBindVertexArray(0);  //保证其他调用不会修改VAO
 		// 检查并调用事件，交换缓冲
 		glfwSwapBuffers(window);
@@ -133,11 +137,11 @@ void create_shader_program(unsigned int* shaderProgram)
 	if (!success)
 	{
 		glGetProgramInfoLog(*shaderProgram, 512, NULL, infoLog);
-		cout << "GLPROGRAM LINK SHADER ERROR:\n" << infoLog << endl;
+		cout << "ERROR: GLPROGRAM LINK SHADER ERROR:\n" << infoLog << endl;
 	}
 	else
 	{
-		cout << "GLPROGRAM LINK SHADER SUCCESS" << endl;
+		cout << "SUCCESS: GLPROGRAM LINK SHADER SUCCESS" << endl;
 	}
 }
 
@@ -158,7 +162,7 @@ void create_vertex_shader(unsigned int* vertexShader) {
 	}
 	else
 	{
-		cout << "SHADER VERTEX COMPILATION_SUCCESS" << endl;
+		cout << "SUCCESS: SHADER VERTEX COMPILATION_SUCCESS" << endl;
 	}
 }
 
@@ -180,7 +184,7 @@ void create_fragment_shader(unsigned int* fragmentShader)
 	}
 	else
 	{
-		cout << "SHADER FRAGMENT COMPILATION_SUCCESS" << endl;
+		cout << "SUCCESS: SHADER FRAGMENT COMPILATION_SUCCESS" << endl;
 	}
 }
 
