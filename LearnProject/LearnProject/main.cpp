@@ -18,16 +18,14 @@ using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, float& mixValue);
-void create_vertex_shader(unsigned int* shader_id);
-void create_fragment_shader(unsigned int* shader_id);
-void create_shader_program(unsigned int* shaderProgram);
 
 int main()
 {
 	//  ˝—ßø‚≤‚ ‘
 	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+	trans = glm::rotate(trans, glm::radians(90.f), glm::vec3(0, 0, 1.0f));
+	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 	vec = trans * vec;
 	std::cout << "x=" << vec.x << " y=" << vec.y << " z=" << vec.z << std::endl;
 
@@ -95,8 +93,8 @@ int main()
 	char path[500];
 	_getcwd(path, 500);
 	cout << "Work Path: " << path << endl;
-	string vPath = string(path) + "/resource/shader/vertex/vertex02_texture.shader";
-	string fPath = string(path) + "/resource/shader/fragment/fragment02_texture.shader";
+	string vPath = string(path) + "/resource/shader/vertex/vertex03_translate.shader";
+	string fPath = string(path) + "/resource/shader/fragment/fragment03_translate.shader";
 	Shader shader = Shader(vPath.c_str(), fPath.c_str());
 
 	stbi_set_flip_vertically_on_load(true);
@@ -172,6 +170,9 @@ int main()
 		shader.setInt("texture1", 0);
 		shader.setInt("texture2", 1);
 		shader.setFloat("mixValue", mixValue);
+		trans = glm::rotate(trans, timeValue / 20000.0f, glm::vec3(0, 0, -1.0f));
+		unsigned int transformloc = glGetUniformLocation(shader.ID, "transform");
+		glUniformMatrix4fv(transformloc, 1, GL_FALSE, glm::value_ptr(trans));
 		shader.use();
 
 		glActiveTexture(GL_TEXTURE0);
