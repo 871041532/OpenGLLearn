@@ -1,15 +1,20 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
 #include <direct.h>
 using namespace std;
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
 #include "ShaderCode.hpp"
-#include "stb_image.h"
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, float& mixValue);
@@ -19,6 +24,13 @@ void create_shader_program(unsigned int* shaderProgram);
 
 int main()
 {
+	//  ˝—ßø‚≤‚ ‘
+	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
+	glm::mat4 trans = glm::mat4(1.0f);
+	trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+	vec = trans * vec;
+	std::cout << "x=" << vec.x << " y=" << vec.y << " z=" << vec.z << std::endl;
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
