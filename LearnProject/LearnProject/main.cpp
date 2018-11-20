@@ -170,9 +170,8 @@ int main()
 		shader.setInt("texture1", 0);
 		shader.setInt("texture2", 1);
 		shader.setFloat("mixValue", mixValue);
-		trans = glm::rotate(trans, timeValue / 20000.0f, glm::vec3(0, 0, -1.0f));
-		unsigned int transformloc = glGetUniformLocation(shader.ID, "transform");
-		glUniformMatrix4fv(transformloc, 1, GL_FALSE, glm::value_ptr(trans));
+		trans = glm::rotate(trans, timeValue / 200.0f, glm::vec3(0, 0, -1.0f));
+		shader.setMatrix4fv("transform", glm::value_ptr(trans));
 		shader.use();
 
 		glActiveTexture(GL_TEXTURE0);
