@@ -14,21 +14,15 @@ using namespace std;
 
 #include "Shader.h"
 #include "ShaderCode.hpp"
+#include "Global.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, float& mixValue);
 
+
 int main()
 {
-	// 数学库测试
-	glm::vec4 vec(1.0f, 1.0f, 1.0f, 1.0f);
-	glm::mat4 trans = glm::mat4(1.0f);
-	trans = glm::rotate(trans, glm::radians(90.f), glm::vec3(0, 0, 1.0f));
-	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-	vec = trans * vec;
-	std::cout << "x=" << vec.x << " y=" << vec.y << " z=" << vec.z << std::endl;
-
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -155,6 +149,19 @@ int main()
 	//线框模式绘制三角形
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	
+	// 旋转矩阵
+	glm::mat4 trans = glm::mat4(1.0f);
+	//模型矩阵
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(-1.0f, 0, 0.0f));
+	// 观察矩阵
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	// 投影矩阵
+	glm::mat4 projection = glm::mat4(1.0f);
+	projection = glm::perspective(glm::radians(45.0f), Global::ScreenWidth / Global::ScreenHeight, 0.1f, 100.0f);
+
 	float mixValue = 0.2;
 	while (!glfwWindowShouldClose(window))
 	{
@@ -170,8 +177,9 @@ int main()
 		shader.setInt("texture1", 0);
 		shader.setInt("texture2", 1);
 		shader.setFloat("mixValue", mixValue);
-		trans = glm::rotate(trans, timeValue / 200.0f, glm::vec3(0, 0, -1.0f));
-		shader.setMatrix4fv("transform", glm::value_ptr(trans));
+		shader.setMatrix4fv("model", glm::value_ptr(model));
+		shader.setMatrix4fv("view", glm::value_ptr(view));
+		shader.setMatrix4fv("projection", glm::value_ptr(projection));
 		shader.use();
 
 		glActiveTexture(GL_TEXTURE0);
