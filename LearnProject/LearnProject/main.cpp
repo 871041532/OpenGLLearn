@@ -47,10 +47,10 @@ int main()
 	// 顶点(不重复)
 	float vertices[] = {
 		//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
-		0.88f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
-		0.88f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
-		-0.88f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-		-0.88f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
+		0.88f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 1.0f,   // 右上
+		0.88f, -0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   1.0f, 0.0f,   // 右下
+		-0.88f, -0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 0.0f,   // 左下
+		-0.88f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f    // 左上
 	};
 	// 顶点索引
 	unsigned int indices[] =
@@ -119,33 +119,6 @@ int main()
 	}
 	stbi_image_free(data);
 
-	// 第二个纹理
-	// 生成纹理
-	unsigned int texture2;
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	// 为当前绑定的纹理对象设置，纹理环绕
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-	// 为当前绑定的纹理对象设置，纹理过滤
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// mipmap过滤 (只用于缩小的情况)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	// 载入图片生成纹理
-	string texturePath2 = string(path) + "/resource/texture/wall.jpg";
-	data = stbi_load(texturePath2.c_str(), &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "ERROR: Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
 	//线框模式绘制三角形
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -175,7 +148,6 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		shader.setInt("texture1", 0);
-		shader.setInt("texture2", 1);
 		shader.setFloat("mixValue", mixValue);
 		shader.setMatrix4fv("model", glm::value_ptr(model));
 		shader.setMatrix4fv("view", glm::value_ptr(view));
@@ -185,7 +157,6 @@ int main()
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);	
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
 		glBindVertexArray(VAO);	
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);  // EBO顶点个数，EBO中偏移量
 		glBindVertexArray(0);  //保证其他调用不会修改VAO
