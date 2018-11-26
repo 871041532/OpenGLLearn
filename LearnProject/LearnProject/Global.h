@@ -2,6 +2,6 @@
 
 namespace Global
 {
-	float ScreenWidth = 600;
-	float ScreenHeight = 600;
+	const float ScreenWidth = 600;
+	const float ScreenHeight = 600;
 }
