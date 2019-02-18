@@ -51,12 +51,17 @@ int main()
 	// 绑定VAO
 	glBindVertexArray(VAO);
 
-	// 顶点数组
 	float vertices[] = {
+		-0.5f, 0.5f, 0.0f, //
 		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f, //
+		 0.5f, 0.5f, 0.0f,
 	};
+	unsigned int indices[] = {
+		0, 1, 2,
+		0, 2, 3,
+	};
+
 	//创建缓冲对象VBO
 	unsigned int VBO;
 	glGenBuffers(1, &VBO);
@@ -68,6 +73,12 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	// 启用顶点属性
 	glEnableVertexAttribArray(0);
+
+	// 索引缓冲对象EBO
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
 	// 顶点着色器源代码
@@ -124,6 +135,8 @@ int main()
 	}
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	// 线框模式
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// 设置渲染循环
 	while (!glfwWindowShouldClose(window))
@@ -135,7 +148,9 @@ int main()
 
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3); // 顶点数组起始索引，顶点数目
+		//glDrawArrays(GL_TRIANGLES, 0, 6); // 顶点数组起始索引，顶点数目。直接从VBO中获取只能绘制一个三角形
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // 最后参数是EBO偏移量
+		glBindVertexArray(0);
 	}
 
 	// 释放初始化时分配的资源
