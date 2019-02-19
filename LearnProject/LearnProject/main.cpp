@@ -52,15 +52,12 @@ int main()
 	glBindVertexArray(VAO);
 
 	float vertices[] = {
-		-0.5f, 0.5f, 0.0f, //
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f, //
-		0.5f, 0.5f, 0.0f,
+		// 位置               // 颜色
+		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
 	};
-	unsigned int indices[] = {
-		0, 1, 2,
-		0, 2, 3,
-	};
+
 
 	//创建缓冲对象VBO
 	unsigned int VBO;
@@ -70,24 +67,26 @@ int main()
 	// 将顶点数据复制到缓冲内存
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	// 链接顶点属性, 起始位置，顶点属性大小，数据类型， 非标准化， 步长， 起始位置偏移量
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	// 启用顶点属性
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	// 颜色属性
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
-	// 索引缓冲对象EBO
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
+	//unsigned int indices[] = {0, 1, 2};
+	//unsigned int EBO;	//glGenBuffers(1, &EBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// 顶点着色器源代码
 	auto vertexShaderSource = R"(
 	#version 330 core
 	layout (location = 0) in vec3 aPos;
+	layout (location = 1) in vec3 aColor;
+	out vec3 ourColor;
 	void main()
 	{
-		gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+		gl_Position = vec4(aPos, 1.0);
+		ourColor = aColor;
 	}
 	)";
 	// 创建着色器对象
@@ -110,9 +109,10 @@ int main()
 	auto fragmentShaderSource = R"(
 	#version 330 core
 	out vec4 FragColor;
+	in vec3 ourColor;
 	void main()
 	{
-		FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+		FragColor = vec4(ourColor, 1.0);
 	}
 	)";
 	// 片元着色器对象
@@ -136,7 +136,7 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	// 线框模式
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// 设置渲染循环
 	while (!glfwWindowShouldClose(window))
@@ -146,10 +146,16 @@ int main()
 		glfwPollEvents();
 		clearWithColor();
 
+		// 设置着色器颜色
+		float timeValue = glfwGetTime();
+		float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+		int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 		glUseProgram(shaderProgram);
+		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
 		glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 6); // 顶点数组起始索引，顶点数目。直接从VBO中获取只能绘制一个三角形
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // 最后参数是EBO偏移量
+		glDrawArrays(GL_TRIANGLES, 0, 3); // 顶点数组起始索引，顶点数目。直接从VBO中获取只能绘制一个三角形
+		//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
 
