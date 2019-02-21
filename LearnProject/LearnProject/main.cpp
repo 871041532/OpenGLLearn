@@ -80,7 +80,7 @@ int main()
 	// 线框模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	Shader ourShader("1.3.2shader.vs", "1.3.2shader.fs");
+	Shader ourShader("1.3.3practice.vs", "1.3.3practice.fs");
 	// 设置渲染循环
 	while (!glfwWindowShouldClose(window))
 	{
@@ -93,7 +93,7 @@ int main()
 		// 设置着色器颜色
 		//float timeValue = glfwGetTime();
 		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		//ourShader.setFloat4("curColor", 0.0f, greenValue, 0.0f, 1.0f);
+		ourShader.setFloat("xOffset", 0.5f);
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3); // 顶点数组起始索引，顶点数目。直接从VBO中获取只能绘制一个三角形
